@@ -6,7 +6,7 @@ import {
   useAuth,
 } from "@clerk/react";
 import { Button } from "@heroui/react";
-import { ThemeProvider } from "./context/themeContext";
+import { ThemeProvider } from "./context/ThemeContext";
 import { WallpaperProvider } from "./context/WallpaperContext";
 import { Navigate, Route, Routes } from "react-router";
 import ChatPage from "./pages/ChatPage";
