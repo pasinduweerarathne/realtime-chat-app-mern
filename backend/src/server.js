@@ -8,6 +8,7 @@ import fs from "fs";
 import path from "path";
 import job from "./lib/cron.js";
 import authRoutes from "./routes/auth.route.js";
+import messageRoutes from "./routes/message.route.js";
 
 const app = express();
 
@@ -32,6 +33,7 @@ app.get("/health", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/messages", messageRoutes);
 
 // if the public directory exists, serve the static files
 // this is useful for serving the frontend build files in production
