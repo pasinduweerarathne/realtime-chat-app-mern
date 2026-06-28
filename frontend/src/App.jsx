@@ -6,11 +6,11 @@ import {
   useAuth,
 } from "@clerk/react";
 import { Button } from "@heroui/react";
-import { ThemeProvider } from "./context/ThemeContext";
-import { WallpaperProvider } from "./context/WallpaperContext";
 import { Navigate, Route, Routes } from "react-router";
 import ChatPage from "./pages/ChatPage";
 import AuthPage from "./pages/AuthPage";
+import { WallpaperProvider } from "./context/WallpaperContext";
+import { ThemeProvider } from "./context/ThemeContext";
 
 function App() {
   const { isSignedIn, isLoaded } = useAuth();
