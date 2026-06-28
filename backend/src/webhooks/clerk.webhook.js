@@ -7,15 +7,12 @@ const router = express.Router();
 router.post("/", async (req, res) => {
   try {
     const signingSecret = process.env.CLERK_WEBHOOK_SIGNING_SECRET;
-
     if (!signingSecret) {
-      res
-        .status(503)
-        .json({ message: "Webhook signing secret is not provided" });
+      res.status(503).json({ message: "Webhook secret is not provided" });
       return;
     }
 
-    // clerk's verifier expects a web request with the raw body; express.raw gives a buffer
+    // clerk's verifier expects a Web Request with the raw body; express.raw gives a Buffer.
     const payload = Buffer.isBuffer(req.body)
       ? req.body.toString("utf8")
       : String(req.body);
@@ -25,21 +22,20 @@ router.post("/", async (req, res) => {
       body: payload,
     });
 
-    // throws if the signature is wrong or the body was tampered with; only then do we trust event
+    // throws if the signature is wrong or the body was tampered with; only then do we trust evt.
     const evt = await verifyWebhook(request, { signingSecret });
 
     if (evt.type === "user.created" || evt.type === "user.updated") {
       const u = evt.data;
 
       const email =
-        u.email_addresses.find((e) => e.id === u.primary_email_address_id)
+        u.email_addresses?.find((e) => e.id === u.primary_email_address_id)
           ?.email_address ?? u.email_addresses?.[0]?.email_address;
 
       const fullName =
         [u.first_name, u.last_name].filter(Boolean).join(" ") ||
         u.username ||
-        email?.split("@")[0] ||
-        "Clerk User";
+        email?.split("@")[0];
 
       await User.findOneAndUpdate(
         { clerkId: u.id },
@@ -49,12 +45,12 @@ router.post("/", async (req, res) => {
     }
 
     if (evt.type === "user.deleted") {
-      await User.findOneAndDelete({ clerkId: evt.data.id });
+      if (evt.data.id) await User.findOneAndDelete({ clerkId: evt.data.id });
     }
 
-    res.status(200).json({ recieved: true });
+    res.status(200).json({ received: true });
   } catch (error) {
-    console.error("Error in Clerk webhook", error);
+    console.error("Error in Clerk webhook:", error);
     res.status(400).json({ message: "Webhook verification failed" });
   }
 });
