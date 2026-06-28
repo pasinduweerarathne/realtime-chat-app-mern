@@ -15,7 +15,7 @@ import { ThemeProvider } from "./context/ThemeContext";
 function App() {
   const { isSignedIn, isLoaded } = useAuth();
 
-  if (!isLoaded) return "Loading...";
+  if (!isLoaded) return <p>Loading...</p>;
 
   return (
     <ThemeProvider>
