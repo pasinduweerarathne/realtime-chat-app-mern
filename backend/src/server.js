@@ -9,8 +9,7 @@ import path from "path";
 import job from "./lib/cron.js";
 import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
-
-const app = express();
+import { app, server } from "./lib/socket.js";
 
 const port = process.env.PORT;
 const FRONTEND_URL = process.env.FRONTEND_URL;
@@ -45,7 +44,7 @@ if (fs.existsSync(publicDir)) {
   });
 }
 
-app.listen(port, () => {
+server.listen(port, () => {
   connectDB();
   console.log("Server is running on PORT:", port);
 

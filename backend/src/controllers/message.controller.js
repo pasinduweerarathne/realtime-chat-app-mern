@@ -1,4 +1,5 @@
 import { hasImagekitConfig, uploadChatMedia } from "../lib/imagekit.js";
+import { getRecieverSocketId, io } from "../lib/socket.js";
 import Message from "../models/message.model.js";
 import User from "../models/user.model.js";
 
@@ -114,6 +115,11 @@ export async function sendMessage(req, res) {
     });
 
     await newMessage.save();
+
+    const recieverSocketId = getRecieverSocketId(recieverId);
+    // only send the message is realtime if user is online
+    if (recieverSocketId)
+      io.to(recieverSocketId).emit("newMessage", newMessage);
 
     res.status(201).json(newMessage);
   } catch (error) {
