@@ -7,6 +7,7 @@ import { clerkMiddleware } from "@clerk/express";
 import fs from "fs";
 import path from "path";
 import job from "./lib/cron.js";
+import authRoutes from "./routes/auth.route.js";
 
 const app = express();
 
@@ -30,6 +31,8 @@ app.get("/health", (req, res) => {
   res.status(200).json({ ok: true });
 });
 
+app.use("/api/auth", authRoutes);
+
 // if the public directory exists, serve the static files
 // this is useful for serving the frontend build files in production
 if (fs.existsSync(publicDir)) {
@@ -43,7 +46,6 @@ if (fs.existsSync(publicDir)) {
 app.listen(port, () => {
   connectDB();
   console.log("Server is running on PORT:", port);
-  console.log(process.env.NODE_ENV);
 
   if (process.env.NODE_ENV === "production") job.start();
 });
