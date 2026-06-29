@@ -12,11 +12,24 @@ import AuthPage from "./pages/AuthPage";
 import { WallpaperProvider } from "./context/WallpaperContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import PageLoader from "./components/PageLoader";
+import { useAuthStore } from "./store/useAuthStore";
+import { useEffect } from "react";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   const { isSignedIn, isLoaded } = useAuth();
+  const clearAuth = useAuthStore((state) => state.clearAuth);
+  const checkAuth = useAuthStore((state) => state.checkAuth);
+  const isCheckingAuth = useAuthStore((state) => state.isCheckingAuth);
 
-  if (!isLoaded) return <PageLoader />;
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    if (isSignedIn) checkAuth();
+    else clearAuth();
+  }, [isLoaded, isSignedIn, checkAuth, clearAuth]);
+
+  if (!isLoaded || (isSignedIn && isCheckingAuth)) return <PageLoader />;
 
   return (
     <ThemeProvider>
@@ -33,6 +46,7 @@ function App() {
             element={!isSignedIn ? <AuthPage /> : <Navigate to={"/"} replace />}
           />
         </Routes>
+        <Toaster />
       </WallpaperProvider>
     </ThemeProvider>
   );
