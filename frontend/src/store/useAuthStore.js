@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { axiosInstance } from "../lib/axios";
+import { axiosInstance, getClerkToken } from "../lib/axios";
 import { io } from "socket.io-client";
 
 const BASE_URL =
@@ -15,6 +15,20 @@ export const useAuthStore = create((set, get) => ({
     set({ isCheckingAuth: true });
 
     try {
+      let token = null;
+
+      for (let attempt = 0; attempt < 3; attempt += 1) {
+        token = await getClerkToken();
+        if (token) break;
+        await new Promise((resolve) => setTimeout(resolve, 300));
+      }
+
+      if (!token) {
+        console.info(
+          "No Clerk token yet; relying on Clerk cookies for auth refresh",
+        );
+      }
+
       const res = await axiosInstance.get("/auth/check");
       set({ authUser: res.data });
 

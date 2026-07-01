@@ -6,11 +6,14 @@ export async function protectRoute(req, res, next) {
     const auth = getAuth(req);
 
     const { userId } = auth;
+    console.log(userId);
 
-    if (!userId)
+    if (!userId) {
       return res.status(401).json({ message: "Unauthorized auth middleware" });
+    }
 
     const user = await User.findOne({ clerkId: userId });
+    console.log(user);
 
     if (!user)
       return res

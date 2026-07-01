@@ -13,6 +13,13 @@ import { app, server } from "./lib/socket.js";
 
 const port = process.env.PORT;
 const FRONTEND_URL = process.env.FRONTEND_URL;
+const ALLOWED_ORIGINS = [
+  FRONTEND_URL,
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "http://127.0.0.1:5173",
+  "http://127.0.0.1:5174",
+].filter(Boolean);
 
 const publicDir = path.join(process.cwd(), "public");
 
@@ -24,7 +31,19 @@ app.use(
 );
 
 app.use(express.json());
-app.use(cors({ origin: FRONTEND_URL, credentials: true }));
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+  }),
+);
 app.use(clerkMiddleware());
 
 app.get("/health", (req, res) => {

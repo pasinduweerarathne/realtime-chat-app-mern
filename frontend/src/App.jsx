@@ -15,9 +15,10 @@ import PageLoader from "./components/PageLoader";
 import { useAuthStore } from "./store/useAuthStore";
 import { useEffect } from "react";
 import { Toaster } from "react-hot-toast";
+import { setTokenGetter } from "./lib/axios";
 
 function App() {
-  const { isSignedIn, isLoaded } = useAuth();
+  const { isSignedIn, isLoaded, getToken } = useAuth();
   const clearAuth = useAuthStore((state) => state.clearAuth);
   const checkAuth = useAuthStore((state) => state.checkAuth);
   const isCheckingAuth = useAuthStore((state) => state.isCheckingAuth);
@@ -25,8 +26,15 @@ function App() {
   useEffect(() => {
     if (!isLoaded) return;
 
-    if (isSignedIn) checkAuth();
-    else clearAuth();
+    setTokenGetter(() => getToken({ force: true }));
+
+    if (isSignedIn) {
+      window.setTimeout(() => {
+        void checkAuth();
+      }, 250);
+    } else {
+      clearAuth();
+    }
   }, [isLoaded, isSignedIn, checkAuth, clearAuth]);
 
   if (!isLoaded || (isSignedIn && isCheckingAuth)) return <PageLoader />;
